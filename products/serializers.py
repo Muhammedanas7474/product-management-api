@@ -1,0 +1,43 @@
+from rest_framework import serializers
+from .models import Product
+from .services import create_product, update_product
+
+
+class ProductSerializer(serializers.ModelSerializer):
+    category_name = serializers.CharField(
+        source="category.name",
+        read_only=True
+    )
+
+    slug = serializers.CharField(required=False, allow_blank=True)
+
+    class Meta:
+        model = Product
+        fields = [
+            "id",
+            "name",
+            "slug",
+            "description",
+            "price",
+            "stock",
+            "category",
+            "category_name",
+            "image",
+            "thumbnail",
+            "is_active",
+            "created_at",
+            "updated_at",
+        ]
+        read_only_fields = [
+            "id",
+            "thumbnail",
+            "created_at",
+            "updated_at",
+            "is_active",   
+        ]
+
+    def create(self, validated_data):
+        return create_product(**validated_data)
+
+    def update(self, instance, validated_data):
+        return update_product(instance, **validated_data)
