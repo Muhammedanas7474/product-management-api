@@ -1,107 +1,149 @@
-# product-management-api
-
 📦 Product Management API
 
-Production-ready Product & Category Management API built with Django REST Framework, designed with performance, scalability, and clean architecture principles.
+Production-ready Product & Category Management API built with Django + Django REST Framework, designed with scalability, performance optimization, and clean architecture principles.
 
-🚀 Overview
+The system is fully containerized and starts with a single Docker command.
 
-This project implements a production-grade backend API with:
+🚀 Project Overview
+
+This API provides:
+
+Full CRUD for Products & Categories
 
 Slug-based resource access
 
-Soft delete support
+Soft delete implementation
 
 Image upload with async thumbnail generation
 
 PostgreSQL database
 
-Redis + Celery for background processing
-
-Dockerized infrastructure
+Redis + Celery background processing
 
 Health checks
 
 Swagger API documentation
 
-Flower monitoring for Celery
+Flower monitoring
 
-Automated test suite
+Automated tests
 
-The system is fully containerized and can be started with a single command.
+Production-ready Docker setup
+
+The goal of this project is to demonstrate production-level backend engineering practices.
 
 🏗 Architecture Overview
 Client → Django API (Gunicorn)
                 ↓
-          PostgreSQL (DB)
+          PostgreSQL (Database)
                 ↓
-         Redis (Broker)
+         Redis (Broker / Cache)
                 ↓
             Celery Worker
                 ↓
-        Thumbnail Generation
+        Async Thumbnail Generation
+🧠 Architecture & Design Decisions
+Framework Choice
 
-Key Design Decisions
+Django + Django REST Framework
 
-PostgreSQL for production reliability
+Chosen for:
 
-SQLite in-memory for tests (faster, isolated)
+Mature ecosystem
 
-Celery + Redis for async image processing
+Built-in ORM
 
-Supervisor to manage Gunicorn + Celery in one container
+Robust authentication support
 
-Docker volumes for persistent media & DB data
+Production reliability
 
-Slug-based URLs for clean REST design
+Design Patterns Used
 
-Indexing & optimized queries for performance
+Service Layer Pattern → Business logic separated from views
+
+Soft Delete Pattern → Safe record deletion without physical removal
+
+Slug-Based Routing → Clean RESTful URLs
+
+Selector / Query Abstraction Pattern → Centralized query logic
+
+Async Task Pattern (Celery) → Non-blocking image processing
+
+Why PostgreSQL?
+
+Production-grade relational database
+
+Strong indexing support
+
+Reliable transaction handling
+
+Why Redis?
+
+Fast in-memory broker
+
+Ideal for Celery background tasks
+
+Why Celery?
+
+Asynchronous task processing
+
+Offloads heavy image thumbnail generation
+
+Keeps API response time fast
+
+Why Supervisor?
+
+Requirement mandates single-container setup.
+
+Supervisor manages:
+
+Gunicorn
+
+Celery worker
+
+Flower
+
+In real-world production, these would be separated into independent containers for scaling.
 
 ⚙️ Tech Stack
 Layer	Technology
-Backend	Django 6 + DRF
+Backend	Django + DRF
 Database	PostgreSQL 15
-Cache/Broker	Redis 7
-Async Tasks	Celery
+Broker	Redis 7
+Async Processing	Celery
 Monitoring	Flower
-Server	Gunicorn
+WSGI Server	Gunicorn
 Containerization	Docker + Docker Compose
-API Docs	DRF Spectacular (Swagger)
+API Documentation	DRF Spectacular (Swagger)
 Testing	Pytest
-🧪 Running the Project
+Code Quality	Ruff + Black
+🧪 Setup & Running with Docker (Required)
 1️⃣ Prerequisites
 
 Docker
 
 Docker Compose
 
-2️⃣ Setup Environment
+2️⃣ Environment Setup
 
-Create .env file from example:
+Create environment file:
 
 cp .env.example .env
 
-
 Ensure it contains:
 
-```env
 DEBUG=True
 SECRET_KEY=your-secret-key
 DATABASE_URL=postgres://postgres:postgres@db:5432/product_db
 REDIS_URL=redis://redis:6379/0
-```
-
-### Environment Variables Explanation
-| Variable | Description |
-|---|---|
-| `DEBUG` | Enables clear error messages. Must be `False` in production. |
-| `SECRET_KEY` | Cryptographic key for Django security. |
-| `DATABASE_URL` | Connection string for PostgreSQL database. |
-| `REDIS_URL` | Connection string for Redis broker and backend. |
-
+📌 Environment Variables Explanation
+Variable	Description
+DEBUG	Enables detailed error output (must be False in production)
+SECRET_KEY	Cryptographic key for Django
+DATABASE_URL	PostgreSQL connection string
+REDIS_URL	Redis broker URL for Celery
 3️⃣ Start the Application
 docker compose up --build
-
 
 This will:
 
@@ -113,14 +155,14 @@ Start Redis
 
 Run migrations
 
-Start Gunicorn
+Start Gunicorn server
 
 Start Celery worker
 
-Start Flower
+Start Flower monitor
 
-No manual steps required.
-
+🛑 Stop the Application
+docker compose down
 🌐 Available Services
 Service	URL
 API Base	http://localhost:8000
@@ -131,8 +173,8 @@ Redoc	http://localhost:8000/api/redoc/
 
 Health Check	http://localhost:8000/health/
 
-Flower (Celery Monitor)	http://localhost:5555
-🗃 API Endpoints
+Flower Monitor	http://localhost:5555
+📚 API Endpoint Reference
 Categories
 
 GET /api/categories/
@@ -157,123 +199,127 @@ PUT /api/products/{slug}/
 
 DELETE /api/products/{slug}/ (Soft Delete)
 
-🖼 Image & Async Processing
+Full interactive documentation available via Swagger UI.
+
+🖼 Celery Task Flow
 
 When a product is created:
 
-Image is uploaded and stored
+Image is uploaded via API
+
+Product record is created
 
 Celery task is triggered
 
 Thumbnail is generated asynchronously
 
-Database updated with thumbnail path
+Thumbnail path is saved in database
 
-To verify:
+This ensures:
 
-docker exec -it product_app ls -R /app/media
+Fast API response
 
-🧠 Database & Performance Optimizations
+Non-blocking image processing
 
-Indexed slug fields
+Improved scalability
 
-Optimized querysets
+Celery uses Redis as broker and runs under Supervisor inside the container.
 
-Soft delete pattern
+🧠 Database Optimization Decisions
 
-Pagination enabled
+Slug fields are indexed for fast lookup
 
-Filtering support
+Optimized queryset usage
 
-PostgreSQL used in production
+Soft delete avoids heavy physical deletion
 
-SQLite in-memory used for tests (faster execution)
+Pagination enabled for large datasets
+
+Filtering support for better query performance
+
+PostgreSQL used in production environment
+
+SQLite in-memory used for tests for faster execution
 
 🧪 Running Tests
 python -m pytest
 
+Test configuration:
 
-Test database uses:
+SQLite in-memory database
 
-SQLite in-memory (:memory:)
+No Docker dependency
 
+Isolated test execution
 
-This ensures:
+🧹 Code Quality
 
-Fast test execution
+This project enforces:
 
-No dependency on Docker
+Ruff (linting)
 
-Isolated test environment
+Black (formatting)
+
+Run locally:
+
+ruff check .
+black .
+
+All committed code passes linting and formatting checks.
 
 🐳 Docker Design
 Multi-Stage Build
 
 Builder stage installs dependencies
 
-Final stage copies only required artifacts
+Final stage contains minimal runtime artifacts
 
-Reduces image size
+Smaller and more secure image
 
-Improves security
+Docker Volumes
 
-Volumes
+postgres_data → Persistent database
 
-postgres_data → persistent DB
-
-media_data → persistent media files
-
-Process Management
-
-Supervisor manages:
-
-Gunicorn
-
-Celery Worker
+media_data → Persistent uploaded files
 
 📊 Health Check
+
 GET /health/
 
-
-Confirms:
+Verifies:
 
 Database connectivity
 
 Application readiness
 
-Used for production readiness and container orchestration.
+Designed for production container orchestration.
 
 📦 Project Structure
 config/          → Django settings
-products/        → Product app
-categories/      → Category app
+products/        → Product application
+categories/      → Category application
 core/            → Shared utilities
-deploy/          → Supervisor config
-media/           → Uploaded files
-docker-compose.yml
+deploy/          → Supervisor configuration
+media/           → Uploaded files (excluded from Git)
 Dockerfile
+docker-compose.yml
 entrypoint.sh
+pyproject.toml
+pytest.ini
+README.md
+requirements.txt
+⚠️ Known Limitations & Trade-offs
 
-🧩 Engineering Decisions Explained
-Why PostgreSQL?
+Single Container Architecture
+Supervisor is used to manage multiple processes in one container.
+In real production systems, services would be separated for independent scaling.
 
-Production-grade relational database with indexing & reliability.
+Volume-Based Media Storage
+Images are stored in Docker volumes.
+In distributed production, S3-compatible storage would be preferred.
 
-Why Redis?
-
-Fast in-memory broker for async tasks.
-
-Why Celery?
-
-Background processing for non-blocking image operations.
-
-Why Supervisor?
-
-Ensures Gunicorn and Celery are managed reliably inside container.
-
-Why SQLite for tests?
-
-Faster, lightweight, avoids external dependencies.
+Authentication Scope
+Advanced authentication mechanisms (JWT/OAuth2) were intentionally omitted to focus on core architecture and async processing.
 
 🛡 Production Readiness Features
 
@@ -281,45 +327,37 @@ Dockerized infrastructure
 
 Health endpoint
 
-Async task monitoring
+Async processing
 
-Structured logging
-
-Environment-based settings
-
-No manual startup steps
+Environment-based configuration
 
 Clean separation of concerns
 
-👨‍💻 Development Notes
+Indexed database fields
 
-Database migrations are version controlled.
+Structured project layout
 
-Database files are not committed.
+Version-controlled migrations
 
-Media files are excluded from Git.
-
-Environment variables are required for production.
+Media & database excluded from Git
 
 📌 Evaluation Alignment
 Dimension	Covered
 Correctness	Full CRUD, slug handling, soft delete, async thumbnail
 Architecture	Clean app separation, service layer usage
 Engineering Depth	Indexed fields, async processing, production Docker
-Communication	Clear README & setup instructions
-### ⚠️ Known Limitations & Trade-offs
-1.  **Single Container Architecture**: requirement #6 mandates a single Docker container using a process supervisor (Supervisord). While this achieves the goal, standard production deployments often favor entirely separate containers for web servers and workers (e.g., Kubernetes pods or ECS tasks) for independent scaling and isolation.
-2.  **Volume Storage**: Images are stored in a local Docker volume (`media_data`). In a distributed production system, an S3-compatible cloud storage backend would be implemented using `django-storages` to prevent horizontal scaling issues.
-3.  **Basic Authentication**: For the scope of this test, complex authentication/authorization features (like JWT or OAuth2) were omitted to focus on core product architecture, caching, and background processing.
-
+Documentation	Complete README & environment explanation
+Production Awareness	Health checks, Docker, async task monitoring
 🏁 Final Notes
 
-The system is designed to:
+This system is designed to:
 
 Start with a single command
 
 Run reliably in containers
 
-Scale background processing independently
+Process background tasks efficiently
 
 Follow production best practices
+
+Maintain clean, scalable architecture
