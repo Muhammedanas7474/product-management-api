@@ -1,9 +1,18 @@
 from rest_framework import serializers
 from .models import Product
 from .services import create_product, update_product
+from categories.models import Category
 
 
 class ProductSerializer(serializers.ModelSerializer):
+
+    category = serializers.SlugRelatedField(
+        slug_field="slug",
+        queryset=Category.objects.all(),
+        required=False,
+        allow_null=True
+    )
+
     category_name = serializers.CharField(
         source="category.name",
         read_only=True
@@ -33,7 +42,7 @@ class ProductSerializer(serializers.ModelSerializer):
             "thumbnail",
             "created_at",
             "updated_at",
-            "is_active",   
+            "is_active",
         ]
 
     def create(self, validated_data):

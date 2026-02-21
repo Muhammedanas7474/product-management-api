@@ -5,6 +5,8 @@ from slugify import slugify
 
 class CategorySerializer(serializers.ModelSerializer):
 
+    slug = serializers.CharField(required=False, allow_blank=True)
+
     class Meta:
         model = Category
         fields = [
