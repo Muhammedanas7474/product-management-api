@@ -2,15 +2,21 @@
 __pycache__/
 *.pyc
 *.pyo
+*.pyd
+.pytest_cache/
 
-# Virtual environment
-venv/
+# Virtualenv
+.venv/
+env/
+
+# Environment
+.env
 
 # Database
 db.sqlite3
 
-# Media files
+# Media
 media/
 
-# Environment variables
-.env
+# Mac
+.DS_Store

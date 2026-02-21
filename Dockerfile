@@ -1,30 +1,34 @@
-FROM python:3.13-slim
-
-# Prevent Python from buffering stdout/stderr
-ENV PYTHONUNBUFFERED=1
+# --------- BUILDER STAGE ---------
+FROM python:3.13-slim AS builder
 
 WORKDIR /app
 
-# Install system dependencies
 RUN apt-get update && apt-get install -y \
     build-essential \
     libpq-dev \
+    netcat-openbsd
+
+COPY requirements.txt .
+RUN pip install --upgrade pip
+RUN pip install --prefix=/install --no-cache-dir -r requirements.txt
+
+
+# --------- FINAL STAGE ---------
+FROM python:3.13-slim
+
+WORKDIR /app
+
+RUN apt-get update && apt-get install -y \
+    libpq-dev \
+    netcat-openbsd \
     supervisor \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Python dependencies
-COPY requirements.txt .
-RUN pip install --upgrade pip
-RUN pip install --no-cache-dir -r requirements.txt
+COPY --from=builder /install /usr/local
 
-# Copy project
 COPY . .
 
-# Create logs directory for supervisor
-RUN mkdir -p /var/log/supervisor
-
-# Expose port
 EXPOSE 8000
+EXPOSE 5555
 
-# Run migrations then start supervisor
-CMD ["sh", "-c", "python manage.py migrate && supervisord -c deploy/supervisord.conf"]
+CMD ["sh", "/app/entrypoint.sh"]

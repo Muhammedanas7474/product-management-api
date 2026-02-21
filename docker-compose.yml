@@ -21,19 +21,17 @@ services:
   app:
     build: .
     container_name: product_app
-    command: >
-      sh -c "python manage.py migrate &&
-             supervisord -c deploy/supervisord.conf"
     ports:
       - "8000:8000"
+      - "5555:5555"   
     env_file:
       - .env
     volumes:
-      - .:/app
-      - ./media:/app/media
+      - media_data:/app/media
     depends_on:
       - db
       - redis
 
 volumes:
   postgres_data:
+  media_data:

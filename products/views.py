@@ -4,6 +4,7 @@ from rest_framework import status, filters
 from rest_framework.pagination import PageNumberPagination
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
+from drf_spectacular.utils import extend_schema
 
 from .models import Product
 from .serializers import ProductSerializer
@@ -49,6 +50,8 @@ class ProductListCreateAPIView(APIView):
             "errors": None
         })
 
+
+    
     def post(self, request):
         serializer = ProductSerializer(data=request.data)
 

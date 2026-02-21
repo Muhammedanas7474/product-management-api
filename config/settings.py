@@ -13,7 +13,7 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-
+import sys
 import environ
 import os
 from pathlib import Path
@@ -50,6 +50,7 @@ INSTALLED_APPS = [
 
     "rest_framework",
     "django_filters",
+    "drf_spectacular",
 
     "products",
     "categories",
@@ -90,16 +91,40 @@ WSGI_APPLICATION = "config.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
-DATABASES = {
-    "default": env.db()
-}
+IS_TESTING = (
+    any("pytest" in arg for arg in sys.argv) or 
+    "test" in sys.argv or 
+    os.environ.get("PYTEST_CURRENT_TEST") is not None
+)
+
+if IS_TESTING:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": ":memory:",
+        }
+    }
+else:
+    # Normal environment (Docker / Production)
+    DATABASES = {
+        "default": env.db()
+    }
+
+
 
 REST_FRAMEWORK = {
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 10,
     "DEFAULT_FILTER_BACKENDS": [
         "django_filters.rest_framework.DjangoFilterBackend"
     ]
+}
+SPECTACULAR_SETTINGS = {
+    "TITLE": "Product Management API",
+    "DESCRIPTION": "Machine Test Submission - Production-ready Product API",
+    "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
 }
 
 
