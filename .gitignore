@@ -1,8 +1,6 @@
 # Python
 __pycache__/
 *.py[cod]
-*.pyo
-*.pyd
 *.log
 
 # Test & Coverage
@@ -15,8 +13,8 @@ htmlcov/
 
 # Virtualenv
 .venv/
-env/
 venv/
+env/
 
 # Environment
 .env

@@ -9,7 +9,7 @@ from rest_framework.views import APIView
 
 from .models import Product
 from .selectors import get_products_queryset
-from .serializers import ProductSerializer
+from .serializers import ProductSerializer, ProductWriteSerializer
 
 
 class ProductFilter(django_filters.FilterSet):
@@ -71,7 +71,7 @@ class ProductListCreateAPIView(APIView):
 
     @extend_schema(
         summary="Create Product",
-        request=ProductSerializer,
+        request=ProductWriteSerializer,
         responses={
             201: inline_serializer(
                 name="ProductCreateResponse",
@@ -90,12 +90,12 @@ class ProductListCreateAPIView(APIView):
         },
     )
     def post(self, request):
-        serializer = ProductSerializer(data=request.data)
+        serializer = ProductWriteSerializer(data=request.data)
 
         if serializer.is_valid():
-            serializer.save()
+            product = serializer.save()
             return Response(
-                {"data": serializer.data, "errors": None},
+                {"data": ProductSerializer(product).data, "errors": None},
                 status=status.HTTP_201_CREATED,
             )
 
@@ -134,7 +134,7 @@ class ProductDetailAPIView(APIView):
 
     @extend_schema(
         summary="Update Product",
-        request=ProductSerializer,
+        request=ProductWriteSerializer,
         responses={
             200: inline_serializer(
                 name="ProductUpdateResponse",
@@ -154,11 +154,11 @@ class ProductDetailAPIView(APIView):
     )
     def put(self, request, slug):
         product = self.get_object(slug)
-        serializer = ProductSerializer(product, data=request.data)
+        serializer = ProductWriteSerializer(product, data=request.data)
 
         if serializer.is_valid():
-            serializer.save()
-            return Response({"data": serializer.data, "errors": None})
+            updated_product = serializer.save()
+            return Response({"data": ProductSerializer(updated_product).data, "errors": None})
 
         return Response(
             {"data": None, "errors": serializer.errors},
@@ -167,7 +167,7 @@ class ProductDetailAPIView(APIView):
 
     @extend_schema(
         summary="Partial Update Product",
-        request=ProductSerializer,
+        request=ProductWriteSerializer,
         responses={
             200: inline_serializer(
                 name="ProductPatchResponse",
@@ -187,11 +187,11 @@ class ProductDetailAPIView(APIView):
     )
     def patch(self, request, slug):
         product = self.get_object(slug)
-        serializer = ProductSerializer(product, data=request.data, partial=True)
+        serializer = ProductWriteSerializer(product, data=request.data, partial=True)
 
         if serializer.is_valid():
-            serializer.save()
-            return Response({"data": serializer.data, "errors": None})
+            updated_product = serializer.save()
+            return Response({"data": ProductSerializer(updated_product).data, "errors": None})
 
         return Response(
             {"data": None, "errors": serializer.errors},

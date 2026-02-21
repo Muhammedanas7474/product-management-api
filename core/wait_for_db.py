@@ -1,7 +1,12 @@
+import os
 import time
 
+import django
 import psycopg2
 from django.conf import settings
+
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
+django.setup()
 
 
 def wait_for_db():

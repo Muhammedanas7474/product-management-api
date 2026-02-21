@@ -49,3 +49,33 @@ class ProductSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         return update_product(instance, **validated_data)
+
+
+class ProductWriteSerializer(serializers.ModelSerializer):
+    category = serializers.SlugRelatedField(
+        slug_field="slug",
+        queryset=Category.objects.all(),
+        required=False,
+        allow_null=True,
+    )
+    slug = serializers.CharField(required=False, allow_blank=True)
+
+    class Meta:
+        model = Product
+        fields = [
+            "name",
+            "slug",
+            "description",
+            "price",
+            "stock",
+            "category",
+            "image",
+            "is_active",
+        ]
+        ref_name = "ProductWrite"
+
+    def create(self, validated_data):
+        return create_product(**validated_data)
+
+    def update(self, instance, validated_data):
+        return update_product(instance, **validated_data)
