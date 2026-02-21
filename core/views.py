@@ -1,15 +1,29 @@
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from django.db import connection
-from django.conf import settings
 import redis
 from celery import current_app
+from django.conf import settings
+from django.db import connection
+from drf_spectacular.utils import extend_schema, inline_serializer
+from rest_framework import serializers
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
 
 class HealthCheckAPIView(APIView):
     authentication_classes = []
     permission_classes = []
 
+    @extend_schema(
+        summary="System Health Check",
+        responses={
+            200: inline_serializer(
+                name="HealthCheckResponse",
+                fields={
+                    "status": serializers.CharField(),
+                    "services": serializers.DictField(child=serializers.CharField()),
+                },
+            )
+        },
+    )
     def get(self, request):
         services = {}
 
@@ -48,7 +62,6 @@ class HealthCheckAPIView(APIView):
         except Exception:
             services["celery_worker"] = "unhealthy"
 
-
         # ------------------
         # Overall Status
         # ------------------
@@ -59,7 +72,4 @@ class HealthCheckAPIView(APIView):
         else:
             overall_status = "error"
 
-        return Response({
-            "status": overall_status,
-            "services": services
-        })
+        return Response({"status": overall_status, "services": services})

@@ -10,19 +10,18 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
-from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 import sys
-import environ
-import os
 from pathlib import Path
+
+import environ
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 env = environ.Env()
 environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
-
 
 
 # Quick-start development settings - unsuitable for production
@@ -47,15 +46,12 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-
     "rest_framework",
     "django_filters",
     "drf_spectacular",
-
     "products",
     "categories",
     "core",
-
 ]
 
 MIDDLEWARE = [
@@ -92,9 +88,9 @@ WSGI_APPLICATION = "config.wsgi.application"
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
 IS_TESTING = (
-    any("pytest" in arg for arg in sys.argv) or 
-    "test" in sys.argv or 
-    os.environ.get("PYTEST_CURRENT_TEST") is not None
+    any("pytest" in arg for arg in sys.argv)
+    or "test" in sys.argv
+    or os.environ.get("PYTEST_CURRENT_TEST") is not None
 )
 
 if IS_TESTING:
@@ -106,19 +102,14 @@ if IS_TESTING:
     }
 else:
     # Normal environment (Docker / Production)
-    DATABASES = {
-        "default": env.db()
-    }
-
+    DATABASES = {"default": env.db()}
 
 
 REST_FRAMEWORK = {
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 10,
-    "DEFAULT_FILTER_BACKENDS": [
-        "django_filters.rest_framework.DjangoFilterBackend"
-    ]
+    "DEFAULT_FILTER_BACKENDS": ["django_filters.rest_framework.DjangoFilterBackend"],
 }
 SPECTACULAR_SETTINGS = {
     "TITLE": "Product Management API",
@@ -126,8 +117,6 @@ SPECTACULAR_SETTINGS = {
     "VERSION": "1.0.0",
     "SERVE_INCLUDE_SCHEMA": False,
 }
-
-
 
 
 # Password validation
@@ -177,6 +166,3 @@ CELERY_TASK_REJECT_ON_WORKER_LOST = True
 
 THUMBNAIL_SIZE = env.int("THUMBNAIL_SIZE", default=300)
 THUMBNAIL_QUALITY = env.int("THUMBNAIL_QUALITY", default=85)
-
-
-

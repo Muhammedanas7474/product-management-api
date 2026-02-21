@@ -1,7 +1,9 @@
 from rest_framework import serializers
+
+from categories.models import Category
+
 from .models import Product
 from .services import create_product, update_product
-from categories.models import Category
 
 
 class ProductSerializer(serializers.ModelSerializer):
@@ -10,13 +12,10 @@ class ProductSerializer(serializers.ModelSerializer):
         slug_field="slug",
         queryset=Category.objects.all(),
         required=False,
-        allow_null=True
+        allow_null=True,
     )
 
-    category_name = serializers.CharField(
-        source="category.name",
-        read_only=True
-    )
+    category_name = serializers.CharField(source="category.name", read_only=True)
 
     slug = serializers.CharField(required=False, allow_blank=True)
 

@@ -1,14 +1,20 @@
 import os
 from io import BytesIO
-from PIL import Image
+
 from celery import shared_task
 from django.conf import settings
 from django.core.files.base import ContentFile
-from django.conf import settings
+from PIL import Image
+
 from .models import Product
 
 
-@shared_task(bind=True, autoretry_for=(Exception,), retry_backoff=True, retry_kwargs={"max_retries": 5})
+@shared_task(
+    bind=True,
+    autoretry_for=(Exception,),
+    retry_backoff=True,
+    retry_kwargs={"max_retries": 5},
+)
 def generate_thumbnail(self, product_id):
     product = Product.objects.get(id=product_id)
 

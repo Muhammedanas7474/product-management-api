@@ -1,6 +1,6 @@
 from .models import Product
-from .utils import generate_unique_slug
 from .tasks import generate_thumbnail
+from .utils import generate_unique_slug
 
 
 def create_product(**validated_data):
@@ -28,10 +28,7 @@ def update_product(instance: Product, **validated_data):
 
     # If slug not provided OR blank and name changed → regenerate
     if (not slug or slug.strip() == "") and name_changed:
-        validated_data["slug"] = generate_unique_slug(
-            validated_data["name"],
-            instance=instance
-        )
+        validated_data["slug"] = generate_unique_slug(validated_data["name"], instance=instance)
 
     for attr, value in validated_data.items():
         setattr(instance, attr, value)

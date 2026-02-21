@@ -1,15 +1,12 @@
 import pytest
-from products.services import create_product
+
 from products.models import Product
+from products.services import create_product
 
 
 @pytest.mark.django_db
 def test_soft_delete():
-    product = create_product(
-        name="Delete Me",
-        price=200,
-        stock=2
-    )
+    product = create_product(name="Delete Me", price=200, stock=2)
 
     product.is_active = False
     product.save()

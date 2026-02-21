@@ -1,5 +1,7 @@
 import uuid
+
 from slugify import slugify
+
 from .models import Product
 
 

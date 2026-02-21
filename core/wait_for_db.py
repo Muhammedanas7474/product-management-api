@@ -1,6 +1,8 @@
 import time
+
 import psycopg2
 from django.conf import settings
+
 
 def wait_for_db():
     db = settings.DATABASES["default"]

@@ -1,13 +1,22 @@
 # Python
 __pycache__/
-*.pyc
+*.py[cod]
 *.pyo
 *.pyd
+*.log
+
+# Test & Coverage
 .pytest_cache/
+.coverage
+htmlcov/
+
+# Lint cache
+.ruff_cache/
 
 # Virtualenv
 .venv/
 env/
+venv/
 
 # Environment
 .env
@@ -15,8 +24,12 @@ env/
 # Database
 db.sqlite3
 
-# Media
+# Media files
 media/
 
 # Mac
 .DS_Store
+
+# IDE
+.vscode/
+.idea/

@@ -1,7 +1,7 @@
 import uuid
-from django.db import models
+
 from django.core.validators import MinValueValidator
-from slugify import slugify
+from django.db import models
 
 
 class Product(models.Model):
@@ -12,22 +12,16 @@ class Product(models.Model):
 
     description = models.TextField(blank=True, null=True)
 
-    price = models.DecimalField(
-        max_digits=10,
-        decimal_places=2,
-        validators=[MinValueValidator(0)]
-    )
+    price = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0)])
 
-    stock = models.IntegerField(
-        validators=[MinValueValidator(0)]
-    )
+    stock = models.IntegerField(validators=[MinValueValidator(0)])
 
     category = models.ForeignKey(
         "categories.Category",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        related_name="products"
+        related_name="products",
     )
 
     image = models.ImageField(upload_to="products/", null=True, blank=True)
@@ -45,8 +39,6 @@ class Product(models.Model):
             models.Index(fields=["updated_at"]),
             models.Index(fields=["is_active"]),
         ]
-
-    
 
     def __str__(self):
         return self.name
